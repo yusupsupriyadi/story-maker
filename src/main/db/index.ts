@@ -133,6 +133,11 @@ const MIGRATIONS: string[] = [
   ALTER TABLE clips ADD COLUMN voice_in_ms INTEGER NOT NULL DEFAULT 0;
   ALTER TABLE clips ADD COLUMN voice_out_ms INTEGER;
   ALTER TABLE clips ADD COLUMN voice_start_ms INTEGER NOT NULL DEFAULT 0;
+  `,
+  // Higgsfield was replaced by ElevenLabs: forget its stored key and the credit estimates cached for it.
+  `
+  DELETE FROM secrets WHERE provider = 'higgsfield';
+  DELETE FROM cache WHERE key LIKE 'estimate:%' OR key = 'models:higgsfield';
   `
 ]
 

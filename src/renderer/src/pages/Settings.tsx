@@ -16,7 +16,7 @@ import {
   SlidersHorizontal,
   Trash2
 } from 'lucide-react'
-import { HF_IMAGE_MODELS, HF_VIDEO_MODELS } from '@shared/higgsfield'
+import { IMAGE_MODELS, VIDEO_MODELS } from '@shared/media'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
 import type { ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
 import { Logo } from '../components/Logo'
@@ -481,7 +481,13 @@ function TtsSection({ settings, statusOf, onChanged, onSettings }: { settings: A
           name={provider === 'gemini' ? 'Google Gemini' : 'ElevenLabs'}
           status={status}
           help={provider === 'gemini' ? 'Kunci Gemini dari Google AI Studio.' : 'Kunci API dari akun ElevenLabs.'}
-          hint={provider === 'gemini' && settings.llmProvider === 'gemini' ? 'Kunci ini dipakai bersama dengan penyusun cerita Gemini.' : undefined}
+          hint={
+            provider === 'elevenlabs'
+              ? 'Kunci ini dipakai bersama untuk gambar dan video.'
+              : settings.llmProvider === 'gemini'
+                ? 'Kunci ini dipakai bersama dengan penyusun cerita Gemini.'
+                : undefined
+          }
           link={provider === 'gemini' ? 'https://aistudio.google.com/apikey' : 'https://elevenlabs.io/app/settings/api-keys'}
           linkLabel={provider === 'gemini' ? 'Buat kunci di Google AI Studio' : 'Buat kunci di ElevenLabs'}
           onChanged={onChanged}
@@ -506,41 +512,41 @@ function TtsSection({ settings, statusOf, onChanged, onSettings }: { settings: A
   )
 }
 
-function HiggsfieldSection({ status, onChanged }: { status?: KeyStatus; onChanged: () => void }) {
+function MediaSection({ settings, status, onChanged }: { settings: AppSettings; status?: KeyStatus; onChanged: () => void }) {
   return (
     <>
-      <SectionTitle icon={<ImageIcon className="size-5" />} title="Gambar dan video" sub="Higgsfield membuat gambar klip, lembar karakter, dan video AI." />
+      <SectionTitle icon={<ImageIcon className="size-5" />} title="Gambar dan video" sub="ElevenLabs membuat gambar klip, lembar karakter, dan video AI." />
       <Card>
         <div className="flex items-center gap-3">
-          <ProviderLogo id="higgsfield" />
+          <ProviderLogo id="elevenlabs" />
           <div className="flex flex-1 flex-col">
-            <span className="text-base font-bold">Higgsfield</span>
-            <span className="text-[13px] text-ink-2">GPT Image 2.5, Kling, Seedance, dan model lain dari akun Higgsfield kamu</span>
+            <span className="text-base font-bold">ElevenLabs</span>
+            <span className="text-[13px] text-ink-2">GPT Image, Nano Banana, Veo, dan Seedance lewat akun ElevenLabs kamu</span>
           </div>
           <StatusBadge status={status} />
         </div>
         <KeyForm
-          provider="higgsfield"
-          name="Higgsfield"
+          provider="elevenlabs"
+          name="ElevenLabs"
           status={status}
-          placeholder="Tempel hasil tombol Copy API key"
           hint={
             <>
-              Di console Higgsfield, buka API Keys lalu klik <strong className="text-ink">Copy API key</strong> dan tempel di sini. Formatnya{' '}
-              <code className="rounded bg-sand px-1 font-mono text-xs">KEY_ID:KEY_SECRET</code>. Kalau kamu memegang Key ID dan Secret terpisah, gabungkan
-              dengan titik dua.
+              Gambar dan video butuh paket <strong className="text-ink">Pro</strong> ke atas, dan kuncinya harus punya izin{' '}
+              <strong className="text-ink">Image & Video</strong>.
+              {settings.defaultTtsProvider === 'elevenlabs' && ' Kunci ini dipakai bersama untuk suara narator ElevenLabs.'}
             </>
           }
-          help="Kunci dicek dengan permintaan estimasi biaya, tanpa memakai kredit."
-          link="https://higgsfield.ai/s/higgsfield-api-yt-bangtutorial-lPMrHK"
-          linkLabel="Buka console Higgsfield"
+          help="Kunci dicek tanpa memakai kredit."
+          link="https://elevenlabs.io/app/settings/api-keys"
+          linkLabel="Buat kunci di ElevenLabs"
           onChanged={onChanged}
         />
         <p className="flex items-start gap-2.5 border-t border-dashed border-line pt-4 text-[13px] leading-relaxed text-ink-2">
           <Film className="mt-0.5 size-4 shrink-0" />
           <span>
-            Semua {HF_IMAGE_MODELS.length} model gambar dan {HF_VIDEO_MODELS.length} model video Higgsfield bisa dipakai. Modelnya dipilih per proyek
-            di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI.
+            Ada {IMAGE_MODELS.length} model gambar dan {VIDEO_MODELS.length} model video. Model berlabel{' '}
+            <strong className="text-ink">Perlu akses</strong> baru bisa dipakai setelah ElevenLabs membuka aksesnya untuk akunmu. Modelnya dipilih
+            per proyek di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI.
           </span>
         </p>
       </Card>
@@ -617,7 +623,7 @@ export function Settings() {
                 </div>
                 <LlmSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
                 <TtsSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
-                <HiggsfieldSection status={statusOf('higgsfield')} onChanged={reload} />
+                <MediaSection settings={settings} status={statusOf('elevenlabs')} onChanged={reload} />
                 <WhisperSection settings={settings} onSettings={setSettings} />
               </>
             )}

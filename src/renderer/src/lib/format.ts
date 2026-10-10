@@ -37,12 +37,3 @@ export function errorText(e: unknown): string {
   const msg = (e as Error)?.message ?? String(e)
   return msg.replace(/^Error invoking remote method '[^']+': (Error: )?/, '')
 }
-
-/** Higgsfield credits: whole numbers from 10 up, one decimal below. */
-export function creditLabel(n: number): string {
-  return (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString('id-ID')
-}
-
-export function usdLabel(n: number): string {
-  return `US$${n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: n < 1 ? 3 : 2 })}`
-}

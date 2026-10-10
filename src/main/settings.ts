@@ -1,4 +1,4 @@
-import { DEFAULT_IMAGE_MODEL, DEFAULT_VIDEO_MODEL, getImageModel, getVideoModel } from '@shared/higgsfield'
+import { DEFAULT_IMAGE_MODEL, DEFAULT_VIDEO_MODEL, getImageModel, getVideoModel } from '@shared/media'
 import type { AppSettings } from '@shared/types'
 import { getDb } from './db'
 
@@ -27,7 +27,7 @@ export function getSettings(): AppSettings {
   }
   // A provider that no longer exists (e.g. from an older build) falls back to Gemini.
   if (!(out.llmProvider in DEFAULT_SETTINGS.llmModels)) out.llmProvider = 'gemini'
-  // Models dropped from the Higgsfield catalog fall back to the defaults.
+  // Models no longer in the catalog (including Higgsfield ids from older builds) fall back to the defaults.
   out.imageModel = getImageModel(out.imageModel).id
   out.videoModel = getVideoModel(out.videoModel).id
   return out

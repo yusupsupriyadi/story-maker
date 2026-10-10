@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ArrowDownNarrowWide, ChevronDown, RefreshCw, Search, X } from 'lucide-react'
+import { ChevronDown, RefreshCw, Search, X } from 'lucide-react'
 import type { ModelOption } from '@shared/types'
-import { creditLabel, relativeTime, usdLabel } from '../lib/format'
+import { relativeTime } from '../lib/format'
 import { Spinner, cx } from './ui'
 
 function ctxLabel(n?: number | null): string | null {
@@ -39,7 +39,6 @@ export function ModelPicker({
   tagFilters,
   align = 'left',
   menuClassName,
-  footerNote,
   renderIcon
 }: {
   value: string
@@ -60,8 +59,6 @@ export function ModelPicker({
   /** Which edge a menu wider than the button lines up with. */
   align?: 'left' | 'right'
   menuClassName?: string
-  /** Extra text in the list footer, e.g. what the listed credits pay for. */
-  footerNote?: string
   /** A mark shown before each model name, e.g. its brand logo. */
   renderIcon?: (m: ModelOption) => ReactNode
 }) {
@@ -70,7 +67,6 @@ export function ModelPicker({
   const [query, setQuery] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [active, setActive] = useState(0)
-  const [cheapFirst, setCheapFirst] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLInputElement>(null)
@@ -108,21 +104,16 @@ export function ModelPicker({
       .map(([t]) => t)
   }, [models, tagFilters])
 
-  // Higgsfield lists carry credit estimates (creditUnit marks them); known prices can be sorted cheapest first.
-  const priced = models.some((m) => m.credits != null)
-
   const filtered = useMemo(() => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean)
-    const list = models.filter((m) => matches(m, words) && tags.every((t) => m.tags.includes(t)))
-    if (!cheapFirst) return list
-    return [...list].sort((a, b) => (a.credits ?? Infinity) - (b.credits ?? Infinity))
-  }, [models, query, tags, cheapFirst])
+    return models.filter((m) => matches(m, words) && tags.every((t) => m.tags.includes(t)))
+  }, [models, query, tags])
 
   const customId = query.trim()
   const showCustom = allowCustom && customId && !models.some((m) => m.id === customId)
   const rows = filtered.length + (showCustom ? 1 : 0)
 
-  useEffect(() => setActive(0), [query, tags, cheapFirst])
+  useEffect(() => setActive(0), [query, tags])
   useEffect(() => {
     list.current?.querySelector<HTMLElement>(`[data-row="${active}"]`)?.scrollIntoView({ block: 'nearest' })
   }, [active])
@@ -214,7 +205,7 @@ export function ModelPicker({
                 </button>
               )}
             </label>
-            {(allTags.length > 0 || priced) && (
+            {allTags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {allTags.map((t) => {
                   const on = tags.includes(t)
@@ -233,20 +224,6 @@ export function ModelPicker({
                     </button>
                   )
                 })}
-                {priced && (
-                  <button
-                    type="button"
-                    aria-pressed={cheapFirst}
-                    onClick={() => setCheapFirst(!cheapFirst)}
-                    className={cx(
-                      'ml-auto inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-xs font-medium',
-                      cheapFirst ? 'border-ink bg-ink text-paper' : 'border-line-2 text-ink-2 hover:border-ink-2'
-                    )}
-                  >
-                    <ArrowDownNarrowWide className="size-3.5" />
-                    Termurah dulu
-                  </button>
-                )}
               </div>
             )}
           </div>
@@ -299,19 +276,6 @@ export function ModelPicker({
                   <span className="flex shrink-0 flex-col items-end gap-0.5 text-[11.5px] text-ink-2">
                     {ctxLabel(m.contextLength) && <span className="font-mono">{ctxLabel(m.contextLength)} konteks</span>}
                     {price && <span className={cx('font-mono', price === 'Gratis' && 'font-semibold text-ok-ink')}>{price}</span>}
-                    {m.creditUnit !== undefined &&
-                      (m.credits === undefined ? (
-                        <Spinner className="mt-1 size-3.5 text-muted" />
-                      ) : m.credits === null ? (
-                        <span className="text-muted" title="Higgsfield tidak memberi perkiraan untuk model ini">
-                          —
-                        </span>
-                      ) : (
-                        <>
-                          <span className="font-mono text-[12.5px] font-semibold text-ink">{creditLabel(m.credits)} kr</span>
-                          <span className="font-mono text-muted">{[m.creditUnit, m.usd != null && usdLabel(m.usd)].filter(Boolean).join(' · ')}</span>
-                        </>
-                      ))}
                   </span>
                 </button>
               )
@@ -337,7 +301,6 @@ export function ModelPicker({
             <span className="flex-1">
               {filtered.length.toLocaleString('id-ID')} dari {models.length.toLocaleString('id-ID')} model
               {models.some((m) => m.priceIn != null) && ' · harga per 1 juta token (masuk / keluar)'}
-              {footerNote && ` · ${footerNote}`}
               {fetchedAt ? ` · diperbarui ${relativeTime(fetchedAt)}` : ''}
             </span>
             {onRefresh && (

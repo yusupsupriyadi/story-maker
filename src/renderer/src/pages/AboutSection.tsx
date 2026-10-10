@@ -62,8 +62,8 @@ export function AboutSection() {
         terpisah. File lisensinya ikut terpasang di folder aplikasi.
       </p>
       <p>
-        Logo Gemini, OpenRouter, Groq, ElevenLabs, dan Higgsfield adalah merek milik pemiliknya masing-masing, dipakai hanya untuk menandai layanan yang
-        terhubung. Ikon penyedia berasal dari LobeHub Icons (lisensi MIT).
+        Logo Gemini, OpenRouter, Groq, ElevenLabs, OpenAI, dan ByteDance adalah merek milik pemiliknya masing-masing, dipakai hanya untuk menandai
+        layanan dan model yang terhubung. Ikon penyedia berasal dari LobeHub Icons (lisensi MIT).
       </p>
     </section>
   )

@@ -38,8 +38,7 @@ const api: StudioApi = {
     missingTts: call('generate:missingTts'),
     narration: call('generate:narration'),
     syncCaptions: call('generate:syncCaptions'),
-    cancel: call('generate:cancel'),
-    estimate: call('generate:estimate')
+    cancel: call('generate:cancel')
   },
   clips: {
     split: call('clips:split'),

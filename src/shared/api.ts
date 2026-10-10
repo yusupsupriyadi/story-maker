@@ -1,11 +1,9 @@
 import type {
   ApiProvider,
-  AspectRatio,
   AppSettings,
   Asset,
   CharacterPatchEvent,
   ClipPatchEvent,
-  CreditEstimate,
   WhisperStatus,
   WordTiming,
   ExportOptions,
@@ -55,8 +53,6 @@ export interface StudioApi {
     /** Re-times caption words of voiced scenes against the audio with the local Whisper model. */
     syncCaptions(projectId: string, mode?: 'stale' | 'all'): Promise<Job>
     cancel(jobId: string): Promise<void>
-    /** Credits for one image, or one video of about `seconds`, with this model. Null without a working key. */
-    estimate(kind: 'image' | 'video', modelId: string, aspect: AspectRatio, seconds?: number, resolution?: string | null): Promise<CreditEstimate | null>
   }
   clips: {
     /** Splits a clip at `atMs` into two clips (picture, voice and narration divided at the nearest pause). */
