@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Bot, Play, Sparkles, Square } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bot, Library, Play, Sparkles, Square } from 'lucide-react'
 import { getImageModel } from '@shared/media'
 import { DURATIONS, LANGUAGES, clipCountFor, llmName } from '@shared/models'
 import { getStyle } from '@shared/styles'
@@ -10,32 +10,31 @@ import { Button, Chip, Field, Segmented, confirmDialog, cx } from '../../compone
 import { errorText } from '../../lib/format'
 import { geminiPreview } from '../../lib/voicePreviews'
 import { TTS_NAMES, ttsReadiness, usableTts } from '../../lib/keys'
+import { usePreviewPlayer } from '../../lib/usePreviewPlayer'
 import { useApp } from '../../store/app'
 import { useProject } from '../../store/project'
 import { ModelSection } from './ModelSection'
+import { VoiceLibraryDialog } from './VoiceLibraryDialog'
 
-/** One sample plays at a time, from the list rows or the button beside the picker. */
-function usePreviewPlayer(): { playing: string | null; toggle: (id: string, url: string) => void } {
-  const audio = useRef<HTMLAudioElement | null>(null)
-  const [playing, setPlaying] = useState<string | null>(null)
-  useEffect(() => () => audio.current?.pause(), [])
-  return {
-    playing,
-    toggle: (id, url) => {
-      audio.current?.pause()
-      if (playing === id) return setPlaying(null)
-      const a = new Audio(url)
-      a.onended = () => setPlaying(null)
-      audio.current = a
-      setPlaying(id)
-      void a.play().catch(() => setPlaying(null))
-    }
-  }
-}
-
-function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; value: string; onChange: (v: string) => void }) {
+function VoicePicker({
+  provider,
+  language,
+  value,
+  onChange
+}: {
+  provider: TtsProvider
+  /** The project's language, the Voice Library's first filter. */
+  language: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  const { toast } = useApp()
   const [voices, setVoices] = useState<VoiceOption[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [library, setLibrary] = useState(false)
+  // A voice just added from the library; kept in the list even if the account list has not caught up yet.
+  const [added, setAdded] = useState<VoiceOption | null>(null)
+  const [version, setVersion] = useState(0)
   const player = usePreviewPlayer()
 
   useEffect(() => {
@@ -46,11 +45,12 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
       .then((list) => {
         // Gemini samples ship with the app; ElevenLabs sends its own preview links.
         const v = provider === 'gemini' ? list.map((x) => ({ ...x, previewUrl: x.previewUrl ?? geminiPreview(x.id, x.name) })) : list
-        setVoices(v)
-        if (!v.some((x) => x.id === value) && v[0]) onChange(v[0].id)
+        const all = provider === 'elevenlabs' && added && !v.some((x) => x.id === added.id) ? [added, ...v] : v
+        setVoices(all)
+        if (!all.some((x) => x.id === value) && all[0]) onChange(all[0].id)
       })
       .catch((e) => setError(errorText(e)))
-  }, [provider])
+  }, [provider, version])
 
   const urlOf = (id: string): string | null => voices?.find((v) => v.id === id)?.previewUrl ?? null
   const current = voices?.find((v) => v.id === value)
@@ -98,6 +98,24 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
         }
       />
       {current && playButton(current.id, 'field')}
+      {provider === 'elevenlabs' && (
+        <Button id="btn-voice-library" size="lg" icon={<Library className="size-[18px]" />} onClick={() => setLibrary(true)}>
+          Cari di Voice Library
+        </Button>
+      )}
+      {library && (
+        <VoiceLibraryDialog
+          language={language}
+          onClose={() => setLibrary(false)}
+          onPick={(v) => {
+            setAdded(v)
+            onChange(v.id)
+            setLibrary(false)
+            setVersion((n) => n + 1)
+            toast('success', `Suara ${v.name} dipakai untuk proyek ini.`)
+          }}
+        />
+      )}
     </>
   )
 }
@@ -264,7 +282,7 @@ export function IdeaStep() {
                     title: ready[p].reason ?? undefined
                   }))}
                 />
-                <VoicePicker provider={project.ttsProvider} value={project.ttsVoice} onChange={(v) => updateProject({ ttsVoice: v })} />
+                <VoicePicker provider={project.ttsProvider} language={project.language} value={project.ttsVoice} onChange={(v) => updateProject({ ttsVoice: v })} />
               </div>
               {blocked.length > 0 && (
                 <span className="text-[13px] text-muted">

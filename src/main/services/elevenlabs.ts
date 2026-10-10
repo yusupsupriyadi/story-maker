@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { isTagToken, toElevenLabsText } from '@shared/speech'
-import type { KeyTestResult, ModelOption, VoiceOption, WordTiming } from '@shared/types'
+import type { KeyTestResult, LibraryVoicePage, LibraryVoiceQuery, ModelOption, VoiceOption, WordTiming } from '@shared/types'
+import { libraryVoicesPath, toLibraryVoice, type RawLibraryVoice } from '@shared/voiceLibrary'
 import { getSecret, requireSecret } from '../secrets'
 import { getSettings } from '../settings'
 import { readError } from './http'
@@ -59,6 +60,27 @@ export async function listVoices(): Promise<VoiceOption[]> {
     token = r.next_page_token
   }
   return out
+}
+
+/** One page of the ElevenLabs Voice Library, filtered by search, language and gender. */
+export async function searchLibraryVoices(query: LibraryVoiceQuery): Promise<LibraryVoicePage> {
+  const r = await el<{ voices: RawLibraryVoice[]; has_more: boolean }>(libraryVoicesPath(query))
+  return { voices: r.voices.map(toLibraryVoice), hasMore: r.has_more }
+}
+
+/** Adds a library voice to the account (narration can only use voices there) and returns its voice id. */
+export async function addLibraryVoice(ownerId: string, voiceId: string, name: string): Promise<string> {
+  try {
+    const r = await el<{ voice_id: string }>(`/v1/voices/add/${encodeURIComponent(ownerId)}/${encodeURIComponent(voiceId)}`, {
+      method: 'POST',
+      body: JSON.stringify({ new_name: name })
+    })
+    return r.voice_id
+  } catch (e) {
+    if (/limit|slot/i.test((e as Error).message))
+      throw new Error('Slot suara di akun ElevenLabs kamu sudah penuh. Hapus suara yang tidak dipakai di ElevenLabs, lalu coba lagi.')
+    throw e
+  }
 }
 
 /** Live list of ElevenLabs models that can do text-to-speech. */

@@ -37,7 +37,13 @@ Pengguna memasukkan kuncinya sendiri di **Pengaturan › Layanan AI dan kunci**.
 | Penyedia | File | Catatan |
 |---|---|---|
 | Gemini TTS | `services/gemini.ts` | PCM 24 kHz → WAV; daftar suara dari Voice Library (`listVoices`, cache 24 jam) dengan cadangan statis di `shared/models.ts`; contoh suara bawaan di `renderer/src/assets/voices` |
-| ElevenLabs | `services/elevenlabs.ts` | memakai endpoint with-timestamps untuk waktu per kata; tag `<...>` diubah ke `[tag]` untuk model v3, atau ke `<break>` untuk model lama (`toElevenLabsText`) |
+| ElevenLabs | `services/elevenlabs.ts` | memakai endpoint with-timestamps untuk waktu per kata; tag `<...>` diubah ke `[tag]` untuk model v3, atau ke `<break>` untuk model lama (`toElevenLabsText`); daftar suara dari akun (`GET /v2/voices`), ditambah Voice Library komunitas (`searchLibraryVoices` → `GET /v1/shared-voices`, `addLibraryVoice` → `POST /v1/voices/add/{owner}/{voice}`) |
+
+Voice Library: request dan pemetaan labelnya ada di `shared/voiceLibrary.ts`. Urutannya berdasarkan pemakaian setahun
+terakhir, dan suara bertarif khusus disembunyikan (`include_custom_rates=false`) supaya biaya per karakter tidak naik
+diam-diam. Narasi hanya bisa memakai suara yang ada di akun, jadi suara dari library ditambahkan dulu; suara yang sudah
+ada di akun (`is_added_by_user`) memakai `voice_id` yang sama dan tidak ditambahkan ulang. Pencarian ElevenLabs bersifat
+longgar: kata yang tidak cocok tetap mengembalikan suara.
 
 Narasi selalu dibuat satu rekaman utuh lalu dipotong. Lihat [alur-produksi.md](alur-produksi.md#4-narasi-srcmainnarrationts).
 

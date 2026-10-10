@@ -10,6 +10,8 @@ import type {
   Job,
   KeyStatus,
   KeyTestResult,
+  LibraryVoicePage,
+  LibraryVoiceQuery,
   ModelList,
   ModelSource,
   MusicPrompt,
@@ -80,6 +82,10 @@ export interface StudioApi {
     revealKey(provider: ApiProvider): Promise<string | null>
     testKey(provider: ApiProvider): Promise<KeyTestResult>
     voices(provider: TtsProvider): Promise<VoiceOption[]>
+    /** One page of the ElevenLabs Voice Library. */
+    libraryVoices(query: LibraryVoiceQuery): Promise<LibraryVoicePage>
+    /** Adds a library voice to the ElevenLabs account; resolves to the voice id narration uses. */
+    addLibraryVoice(ownerId: string, voiceId: string, name: string): Promise<string>
   }
   models: {
     /** Live model list from the provider. Served from cache unless `refresh` is set or the cache is stale. */

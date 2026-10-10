@@ -275,6 +275,35 @@ export interface VoiceOption {
   previewUrl?: string | null
 }
 
+/** Filters for one page of the ElevenLabs Voice Library. */
+export interface LibraryVoiceQuery {
+  search: string
+  /** ISO 639-1 code such as "id"; empty for every language. */
+  language: string
+  gender: 'all' | 'male' | 'female'
+  page: number
+}
+
+/** A voice from the ElevenLabs Voice Library, which must be added to the account before narration can use it. */
+export interface LibraryVoice {
+  id: string
+  /** The voice owner's public id, needed to add the voice to the account. */
+  ownerId: string
+  name: string
+  /** Short labels in Indonesian, e.g. "Wanita, muda, cerita". */
+  labels: string
+  description: string
+  language: string | null
+  previewUrl: string | null
+  /** Already among the user's ElevenLabs voices. */
+  added: boolean
+}
+
+export interface LibraryVoicePage {
+  voices: LibraryVoice[]
+  hasMore: boolean
+}
+
 export interface AppSettings {
   defaultTtsProvider: TtsProvider
   defaultLanguage: string

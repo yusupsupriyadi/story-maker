@@ -8,6 +8,11 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ## [Belum dirilis]
 
+### Ditambahkan
+- Tombol **Cari di Voice Library** di pemilih suara narator ElevenLabs: cari suara komunitas ElevenLabs menurut
+  bahasa, jenis kelamin, dan kata kunci, dengarkan contohnya, lalu pakai untuk proyek. Suara yang dipilih ditambahkan
+  ke akun ElevenLabs kamu (memakai satu slot suara).
+
 ### Diubah
 - Gambar klip, lembar karakter, dan video AI sekarang dibuat lewat ElevenLabs, memakai kunci yang sama dengan suara
   narator. Butuh paket ElevenLabs Pro ke atas dan kunci dengan izin Image & Video.

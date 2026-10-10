@@ -10,6 +10,8 @@ import type {
   ModelSource,
   NewProjectInput,
   ProjectSnapshot,
+  LibraryVoicePage,
+  LibraryVoiceQuery,
   TtsProvider,
   VoiceOption,
   WordTiming
@@ -219,6 +221,10 @@ export function registerIpc(): void {
     if (provider === 'gemini') return gemini.listVoices()
     return eleven.listVoices()
   })
+  handle('settings:libraryVoices', (query: LibraryVoiceQuery): Promise<LibraryVoicePage> => eleven.searchLibraryVoices(query))
+  handle('settings:addLibraryVoice', (ownerId: string, voiceId: string, name: string): Promise<string> =>
+    eleven.addLibraryVoice(ownerId, voiceId, name)
+  )
 
   handle('export:start', (projectId: string, opts: ExportOptions) => startExport(projectId, opts))
   handle('export:defaultFolder', () => defaultExportFolder())

@@ -59,7 +59,9 @@ const api: StudioApi = {
     clearKey: call('settings:clearKey'),
     revealKey: call('settings:revealKey'),
     testKey: call('settings:testKey'),
-    voices: call('settings:voices')
+    voices: call('settings:voices'),
+    libraryVoices: call('settings:libraryVoices'),
+    addLibraryVoice: call('settings:addLibraryVoice')
   },
   models: {
     list: call('models:list')
