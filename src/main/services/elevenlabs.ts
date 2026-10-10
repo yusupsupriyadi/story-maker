@@ -1,10 +1,12 @@
+import { app } from 'electron'
 import { isTagToken, toElevenLabsText } from '@shared/speech'
 import type { KeyTestResult, ModelOption, VoiceOption, WordTiming } from '@shared/types'
 import { getSecret, requireSecret } from '../secrets'
 import { getSettings } from '../settings'
 import { readError } from './http'
 
-const BASE = 'https://api.elevenlabs.io'
+// Development builds can point at a local mock (STUDIO_ELEVEN_BASE) so tests never send a real key or spend credits.
+export const BASE = (!app.isPackaged && process.env.STUDIO_ELEVEN_BASE) || 'https://api.elevenlabs.io'
 
 async function el<T>(path: string, init: RequestInit & { key?: string } = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
