@@ -58,7 +58,7 @@ const MODELS: MediaModel[] = [
   image('bytedance-seedream-5-lite', 'Seedream 5 Lite', 'Seedream', 10, ['2K', '3K'], { gated: true, tags: ['Seedream', ACCESS_TAG] }),
   video('veo-3.1-fast-generate-001', 'Veo 3.1 Fast', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { tags: ['Veo', '4K'] }),
   video('veo-3.1-generate-001', 'Veo 3.1', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { tags: ['Veo', '4K'] }),
-  video('bytedance-seedance-v2', 'Seedance 2.0', 'Seedance', { min: 4, max: 15 }, ['480p', '720p', '1080p', '4k'], { ...SEEDANCE, tags: ['Seedance', '4K', ACCESS_TAG] }),
+  video('bytedance-seedance-v2', 'Seedance 2.0', 'Seedance', { min: 4, max: 15 }, ['480p', '720p', '1080p', '4k'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG, '4K'] }),
   video('bytedance-seedance-v2-fast', 'Seedance 2.0 Fast', 'Seedance', { min: 4, max: 15 }, ['480p', '720p'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG] }),
   video('bytedance-seedance-v2-mini', 'Seedance 2.0 Mini', 'Seedance', { min: 4, max: 15 }, ['480p', '720p'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG] }),
   video('bytedance-seedance-v2.5', 'Seedance 2.5', 'Seedance', { min: 4, max: 30 }, ['480p', '720p', '1080p'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG] })
