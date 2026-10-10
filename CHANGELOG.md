@@ -8,6 +8,16 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ## [Belum dirilis]
 
+### Diubah
+- Gambar klip, lembar karakter, dan video AI sekarang dibuat lewat ElevenLabs, memakai kunci yang sama dengan suara
+  narator. Butuh paket ElevenLabs Pro ke atas dan kunci dengan izin Image & Video.
+- Pilihan model: 9 model gambar (GPT Image, Nano Banana, Seedream) dan 6 model video (Veo, Seedance). Seedream dan
+  Seedance baru bisa dipakai setelah ElevenLabs membuka aksesnya. Proyek lama otomatis memakai model bawaan baru.
+
+### Dihapus
+- Higgsfield. Kunci Higgsfield yang tersimpan dihapus saat aplikasi diperbarui.
+- Perkiraan kredit di pemilih model dan storyboard, karena API ElevenLabs tidak menyediakannya.
+
 ## [1.0.0] - 2026-10-02
 
 Rilis pertama Bang Story (sebelumnya bernama Studio Cerita).

@@ -7,7 +7,7 @@ Ide cerita ──LLM──► Naskah (adegan + narasi) ──LLM──► Rencan
                                                      │
             ┌────────────────────────────────────────┼─────────────────────────┐
             ▼                                         ▼                         ▼
-   Lembar karakter (Higgsfield)          Gambar klip (Higgsfield)       Narasi satu rekaman (TTS)
+   Lembar karakter (ElevenLabs)          Gambar klip (ElevenLabs)       Narasi satu rekaman (TTS)
             └────────── referensi ──────────────────►│                         │
                                                      ▼                         ▼
                                           Video AI (opsional)        Potong per adegan + Whisper

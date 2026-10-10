@@ -48,7 +48,7 @@ $env:STUDIO_USER_DATA = "C:\temp\bangstory-dev"; npm run dev
 | `STUDIO_USER_DATA` | folder data alternatif |
 | `STUDIO_CAPTURE_PLAN` | path file JSON rencana dev harness (lihat di bawah) |
 | `STUDIO_LOG` | file untuk menampung `console` renderer dan error harness |
-| `STUDIO_HF_BASE` | base URL Higgsfield tiruan (mock) supaya UI bisa diuji tanpa kredit |
+| `STUDIO_ELEVEN_BASE` | base URL ElevenLabs tiruan (mock) untuk suara, gambar, dan video, supaya UI bisa diuji tanpa kredit |
 | `STUDIO_WHISPER_URL` | URL model Whisper alternatif (misalnya server lokal) untuk menguji unduhan |
 
 ## Dev harness (pengujian otomatis)
@@ -163,9 +163,9 @@ Gambar di `docs/images/` diambil dari aplikasi sungguhan dengan dev harness, mem
 
 1. Salin `studio.db` lewat backup SQLite (buka sumbernya read-only) ke folder uji, **kosongkan tabel `secrets`**,
    lalu salin folder `projects`.
-2. Di rencana harness, isi kunci palsu (`{"main":"key","provider":"higgsfield","ok":true}`, juga untuk penyedia
-   lain) supaya banner "atur kunci" tidak muncul. Set `STUDIO_HF_BASE=http://127.0.0.1:9` agar aplikasi tidak
-   mengirim kunci palsu itu ke Higgsfield.
+2. Di rencana harness, isi kunci palsu (`{"main":"key","provider":"elevenlabs","ok":true}`, juga untuk penyedia
+   lain) supaya banner "atur kunci" tidak muncul. Set `STUDIO_ELEVEN_BASE=http://127.0.0.1:9` agar aplikasi tidak
+   mengirim kunci palsu itu ke ElevenLabs.
 3. Ambil screenshot dengan `shot` (jendela bawaan 1440×900, isi halaman 1424×861).
 4. Ubah ke WebP kualitas 90 dengan bingkai 1 px warna `line-2` (`#d4cbbb`), lalu hapus salinan data uji.
 

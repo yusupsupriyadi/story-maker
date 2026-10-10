@@ -3,8 +3,8 @@
 ## Bahasa
 
 - **Teks yang dilihat pengguna: Bahasa Indonesia** yang santai dan jelas, menyapa dengan "kamu". Pesan error
-  menjelaskan apa yang terjadi dan apa yang bisa dilakukan, misalnya: "Kredit Higgsfield tidak cukup. Isi ulang
-  di dashboard Higgsfield."
+  menjelaskan apa yang terjadi dan apa yang bisa dilakukan, misalnya: "Kredit ElevenLabs tidak cukup. Isi ulang
+  atau naikkan paket di ElevenLabs."
 - **Kode, nama, dan komentar: bahasa Inggris.** Komentar menjelaskan *kenapa* (alasan, jebakan, batasan), bukan
   mengulang apa yang sudah jelas dari kode.
 - Angka desimal di UI memakai koma ("3,5 dtk"); satuan pendek: `dtk`, `dB`, `px`.
@@ -52,7 +52,7 @@ Bayangan "tinta" (`shadow-ink`) memberi kesan kertas dan tinta. Font caption ada
 2. **Pilihan visual** (gaya gambar dll.) dipilih dari **grid thumbnail persegi 1:1**, bukan daftar teks. Contoh
    gambarnya berfokus pada karakter, menghadap kamera, dengan subjek berbeda tiap pilihan.
 3. **Satu dropdown penyedia per bagian** (misalnya LLM atau TTS): hanya formulir penyedia terpilih yang
-   ditampilkan. Kunci Higgsfield cukup satu kolom (format `KEY_ID:KEY_SECRET` dari tombol "Copy API key").
+   ditampilkan. Kunci yang dipakai beberapa bagian (Gemini, ElevenLabs) diberi catatan "dipakai bersama".
 4. **Pilihan yang tidak bisa dipakai dinonaktifkan**, misalnya penyedia TTS tanpa kunci valid.
 5. **Kurangi klik manual.** AI mengisi pengaturan per klip (gerak kamera, kekuatan, transisi, arahan video), dan
    pratinjau berjalan otomatis.

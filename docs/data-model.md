@@ -14,7 +14,7 @@ Tipe TypeScript-nya ada di `src/shared/types.ts`; skema SQLite di `src/main/db/i
 | `jobs` | pekerjaan AI/render beserta status dan progresnya |
 | `settings` | pengaturan aplikasi (key → JSON) |
 | `secrets` | kunci API terenkripsi + hasil tes terakhir |
-| `cache` | cache bebas (daftar model, estimasi kredit, daftar suara), dengan `updated_at` |
+| `cache` | cache bebas (daftar model, daftar suara), dengan `updated_at` |
 
 Relasi `project_id` memakai `ON DELETE CASCADE`. Tidak ada foreign key antara klip dan aset; klip menunjuk aset
 lewat `image_asset_id`, `video_asset_id`, `audio_asset_id`. Aset lama tetap tersimpan sebagai riwayat versi.
@@ -45,7 +45,7 @@ menjalankannya.
 | `durationSec`, `language`, `aspectRatio` | target durasi, bahasa naskah/suara, `16:9` atau `9:16` |
 | `styleId` | gaya visual (`src/shared/styles.ts`, 20 gaya) |
 | `ttsProvider`, `ttsVoice` | `gemini` atau `elevenlabs` + ID suara |
-| `imageModel`, `videoModel`, `videoResolution` | model Higgsfield per proyek (null = bawaan aplikasi) |
+| `imageModel`, `videoModel`, `videoResolution` | model gambar/video ElevenLabs per proyek (null atau ID yang tidak dikenal = bawaan aplikasi) |
 | `status`, `step` | `draft`/`script`/`storyboard`/`editing`/`exported`; langkah 1 Ide, 2 Naskah, 3 Storyboard, 4 Editor |
 | `coverAssetId` | gambar sampul kartu proyek |
 | `editor` | `EditorSettings` (JSON), lihat di bawah |
@@ -94,7 +94,7 @@ Tambahkan di semua tempat berikut, atau data akan hilang diam-diam:
 | `kind` | `image`, `video`, `audio`, `music`, `overlay`, `export` |
 | `clipId` / `characterId` | pemiliknya (riwayat versi per klip/pemeran) |
 | `provider`, `model`, `prompt` | asal file; untuk audio narasi `prompt` = teks narasi saat direkam |
-| `remoteId`, `remoteUrl` | ID permintaan dan URL hasil di Higgsfield |
+| `remoteId`, `remoteUrl` | ID generation ElevenLabs; `remoteUrl` dikosongkan karena URL hasil hanya berlaku sekitar 1 jam |
 | `localPath` | path relatif di folder proyek; `url` = `studio://asset/...` |
 | `durationMs`, `width`, `height` | hasil probe FFmpeg |
 | `meta` | JSON bebas, lihat di bawah |
@@ -108,8 +108,6 @@ Tambahkan di semua tempat berikut, atau data akan hilang diam-diam:
 | `timedBy` | `whisper-dtw` kalau waktu kata dari Whisper metode terbaru |
 | `voice`, `take` | ID suara dan ID rekaman utuh tempat potongan ini berasal |
 | `editedWords` | `true` kalau teks caption diedit manual |
-
-`meta.uploadedUrl`/`uploadedAt` dipakai untuk menggunakan ulang file yang sudah diunggah ke Higgsfield.
 
 Narasi dianggap **basi** (perlu direkam ulang) kalau `asset.prompt` berbeda dari `clip.narration`.
 

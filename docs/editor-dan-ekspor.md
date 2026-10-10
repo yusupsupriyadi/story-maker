@@ -9,7 +9,7 @@ semua aturan yang memengaruhi hasil ditulis di `src/shared/` dan dipakai dua sis
 | `captions.ts` | gaya caption, 15 font + metriknya, pemenggalan baris, potongan caption, kotak rounded | Player | exporter (ASS) |
 | `timeline.ts` | `voiceSpan`, `clipCaptionWords`, `musicSpan`, `splitNarration` | engine, Timeline | exporter, editing |
 | `overlays.ts` | posisi (anchor numpad), gaya teks overlay | Player, OverlayPanel | exporter |
-| `higgsfield.ts` | body permintaan model, durasi, resolusi | ModelSection | generation |
+| `media.ts` | body permintaan model, durasi, resolusi | ModelSection | generation |
 
 ## Model timeline
 

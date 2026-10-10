@@ -75,8 +75,9 @@ Mars, dan baju astronot di semua adegan. Setiap prompt kini menyebut dunia/era d
 "human", dan baju per adegan ditulis di baris `Wardrobe` (bawaan lembar karakter atau custom).
 
 ### Prompt video selalu melarang musik
-Beberapa model video (Veo, Grok, MiniMax) membuat musik sendiri tanpa saklar. Setiap prompt diakhiri `NO_MUSIC`,
-dan audio dimatikan lewat parameter kalau modelnya punya. Audio dari file video tidak pernah dipakai di ekspor.
+Model video bisa membuat musik sendiri. Permintaan ke ElevenLabs selalu mengirim `generate_audio: false`, dan setiap
+prompt tetap diakhiri `NO_MUSIC` sebagai pengaman kalau ada model yang mengabaikan saklar itu. Audio dari file video
+tidak pernah dipakai di ekspor.
 
 ### Kunci API dienkripsi safeStorage, kunci kripto dibuat saat startup
 Kunci kriptografi `safeStorage` baru tertulis ke `Local State` sekitar 10 detik setelah dibuat. Membuatnya saat
@@ -85,3 +86,23 @@ startup (`warmUpEncryption`) mencegah kunci API tidak terbaca setelah aplikasi d
 ### YouTube embed diberi Referer berisi ID aplikasi
 Halaman dari `file://` tidak mengirim Referer, dan YouTube menolak embed tanpa identitas (Error 153). Header
 ditambahkan hanya untuk `https://www.youtube.com/embed/*`.
+
+### Gambar dan video lewat ElevenLabs, referensi dikirim inline
+Higgsfield diganti API Image & Video ElevenLabs supaya satu kunci cukup untuk suara, gambar, dan video. Lembar
+karakter dan gambar awal video dikirim sebagai `inline_base64`, bukan diunggah lewat `POST /v1/assets`: tidak ada
+langkah unggah, tidak ada URL kedaluwarsa yang perlu dilacak, dan tidak ada file yang memakan kuota penyimpanan akun
+pengguna. Batasnya 25 MB per gambar, jauh di atas ukuran gambar 2K.
+
+### Tidak ada perkiraan kredit untuk gambar dan video
+API ElevenLabs tidak punya endpoint estimasi biaya, dan biayanya berubah menurut model, resolusi, durasi, dan audio.
+Tabel harga buatan sendiri akan cepat usang, jadi aplikasi tidak menampilkan angka kredit. Biaya per model bisa
+dilihat di aplikasi web ElevenLabs.
+
+### Seedance memakai `aspect_ratio: "auto"`
+Seedance 2.5 selalu memakai `auto` untuk tugas yang dimulai dari gambar awal. Gambar klip sudah dibuat dengan rasio
+proyek, jadi semua varian Seedance memakai `auto` agar aturannya sama dan permintaan tidak ditolak.
+
+### Permintaan baru hanya dicoba ulang saat 429
+Setiap generation yang sudah dimulai ditagih, dan ElevenLabs tidak mendokumentasikan idempotency key. Mengulang
+`POST` setelah 5xx atau koneksi putus bisa memulai generation kedua. Hanya 429 yang dicoba ulang, karena permintaan
+itu pasti ditolak sebelum berjalan. Polling (`GET`) aman diulang.

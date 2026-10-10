@@ -14,13 +14,11 @@ Pengguna memasukkan kuncinya sendiri di **Pengaturan › Layanan AI dan kunci**.
 - `requireSecret(provider)` melempar error berbahasa Indonesia kalau kunci belum ada.
 - `revealSecret` hanya dipanggil tombol "tampilkan kunci" di Pengaturan.
 - **Jangan pernah** menulis kunci ke log, pesan error, file, URL, atau mengirimnya ke layanan lain.
-- Mengganti kunci Higgsfield menghapus cache estimasi kredit (`forgetEstimates`).
 
 | Penyedia (`ApiProvider`) | Dipakai untuk |
 |---|---|
-| `higgsfield` | gambar, lembar karakter, video |
 | `gemini` | LLM (naskah/visual) dan Gemini TTS |
-| `elevenlabs` | TTS |
+| `elevenlabs` | TTS, gambar, lembar karakter, video |
 | `openrouter`, `groq`, `custom` | LLM lewat API kompatibel OpenAI |
 
 ## LLM (`services/llm.ts`, `services/gemini.ts`)
@@ -43,45 +41,50 @@ Pengguna memasukkan kuncinya sendiri di **Pengaturan › Layanan AI dan kunci**.
 
 Narasi selalu dibuat satu rekaman utuh lalu dipotong. Lihat [alur-produksi.md](alur-produksi.md#4-narasi-srcmainnarrationts).
 
-## Higgsfield (`services/higgsfield.ts`, `shared/higgsfield.ts`)
+## ElevenLabs gambar dan video (`services/elevenMedia.ts`, `shared/media.ts`)
 
-- Base URL `https://api.higgsfield.ai`, header `Authorization: Key <kunci>`.
-- Alur: `submit(endpoint, body)` → polling `getStatus` → unduh hasil. `uploadFile` mengunggah gambar referensi
-  (lembar karakter, gambar klip untuk video).
-- `estimate(endpoint, body)` memanggil `/estimate/<endpoint>` → `{ credits, usd }`, dicache 24 jam di tabel `cache`.
-  Endpoint ini gratis (tidak memakai kredit). API Higgsfield tidak punya daftar harga maupun endpoint saldo, jadi
-  biaya per model selalu diambil dari sini.
-- Pesan error dibuat ramah (`friendly`): kunci salah, kredit habis, terlalu banyak proses, model tidak tersedia.
-- Untuk pengembangan, `STUDIO_HF_BASE` bisa diarahkan ke server tiruan (mock) supaya UI bisa diuji tanpa kredit.
+- Memakai kunci `elevenlabs` yang sama dengan TTS, header `xi-api-key`, dan base URL `BASE` dari
+  `services/elevenlabs.ts`. Butuh paket Pro ke atas dan kunci dengan izin *Image & Video* (atau *Flows*).
+- Alur: `submit(kind, body)` → `POST /v1/flows/{image|video}` mengembalikan `id` → `waitForResult` memanggil
+  `GET /v1/flows/{image|video}/{id}` sampai `completed` atau `failed` → hasil diunduh dari `content_url`.
+- Jeda polling: gambar mulai 2 detik dan video mulai 10 detik (batas minimum dari ElevenLabs), naik 1,5× sampai 10
+  dan 30 detik. Batas waktu 15 menit untuk gambar dan 30 menit untuk video.
+- `content_url` adalah URL bertanda tangan yang berlaku sekitar 1 jam, jadi tidak disimpan. `remoteId` aset berisi
+  ID generation.
+- Lembar karakter dan gambar awal video dikirim sebagai `{ type: "inline_base64", content_base64, mime_type }`
+  (PNG, JPG, atau WEBP, maksimal 25 MB). Tidak ada unggahan terpisah dan tidak ada file yang tersimpan di akun
+  pengguna.
+- `submit` hanya mencoba ulang saat 429. Polling mencoba ulang 429, 5xx, dan gangguan jaringan sampai 8 kali.
+- Tidak ada endpoint estimasi biaya dan tidak ada endpoint pembatalan. Membatalkan job hanya menghentikan aplikasi
+  menunggu; ElevenLabs tetap menyelesaikan dan menagih generation itu.
+- Tes kunci (`settings:setKey`) memanggil `testKey` (TTS), lalu `checkAccess`, yaitu `GET /v1/flows/image?page_size=1`
+  yang gratis. Hasilnya ditambahkan ke pesan status kunci.
+- Pesan error (`friendly`): kunci tanpa izin (401), `paid_plan_required`, kredit habis (402),
+  `model_access_denied`, pengaturan ditolak (422), sibuk (429), server bermasalah (5xx). `failure_reason` dari hasil
+  yang gagal (`moderated`, `timeout`, `charging_failed`, `invalid_parameters`, dan lainnya) juga diterjemahkan.
+- Untuk pengembangan, `STUDIO_ELEVEN_BASE` bisa diarahkan ke server tiruan (mock) supaya UI bisa diuji tanpa kredit.
+  Variabel ini juga berlaku untuk TTS ElevenLabs.
 
-### Katalog model (`src/shared/higgsfield-catalog.json`)
+### Katalog model (`src/shared/media.ts`)
 
-48 model: 14 model gambar (teks ke gambar) dan 34 model video yang bisa menganimasikan gambar klip. Model yang butuh
-video masukan (edit video, motion control) atau hanya teks-ke-video sengaja tidak dimasukkan. Seedream belum tersedia
-di API Higgsfield (hanya di aplikasi webnya). Satu entri:
+Ditulis tangan dari referensi API (`/docs/api-reference/flows/image/create` dan `/flows/video/create` di
+elevenlabs.io). API menolak field yang tidak dikenal model, jadi setiap entri mencatat persis apa yang diterima model
+itu:
 
-```json
-{
-  "id": "kling-video/v3.0/std/image-to-video",
-  "name": "Kling 3.0 · Standard · Image to video",
-  "family": "Kling",
-  "kind": "video",
-  "input": { "field": "image_url", "mode": "first-frame", "max": 1 },
-  "required": ["image_url"],
-  "props": { "prompt": { "type": "string" }, "duration": { "type": "integer", "minimum": 3, "maximum": 15 }, "sound": { "enum": ["on", "off"] } },
-  "durations": { "min": 3, "max": 15 },
-  "tags": ["Kling"]
-}
-```
+- `refs`: jumlah lembar karakter yang muat di `images` (model gambar).
+- `resolutions`, `qualities`: nilai `resolution` dan `quality` yang diterima. Kosong berarti field tidak dikirim.
+- `durations`: daftar (`values`) atau rentang (`min`/`max`) `duration_secs` video.
+- `autoAspect`: Seedance memakai `aspect_ratio: "auto"`, rasio diambil dari gambar awal.
+- `enhanceSwitch`: Veo menerima `enhance_prompt: false`.
+- `gated`: model ByteDance (Seedream, Seedance) baru bisa dipakai setelah ElevenLabs membuka aksesnya. Diberi tag
+  `Perlu akses`.
 
-- `input.field`/`mode`/`max`: tempat gambar referensi atau frame pertama dikirim, dan berapa banyak.
-- `props`: skema parameter dari dokumentasi Higgsfield. `imageBody`/`videoBody` di `shared/higgsfield.ts`
-  mengisinya secara umum: rasio, resolusi, kualitas, durasi, mematikan `enhance_prompt`, `prompt_extend`, dan audio.
-- `durations`: rentang (`min`/`max`) atau daftar (`values`) durasi video.
-- **Menambah model**: tambahkan entri baru dengan format yang sama dari dokumentasi API Higgsfield
-  (`https://docs.higgsfield.ai/docs/llms.txt`), lalu pastikan `imageBody`/`videoBody` tidak melempar error
-  "butuh <field>" (`checkRequired`). Ikon keluarga model diatur di `components/ModelLogo.tsx`.
-- Model bawaan: `DEFAULT_IMAGE_MODEL` dan `DEFAULT_VIDEO_MODEL` di `shared/higgsfield.ts`.
+Semua video dimulai dari gambar klip (`start_frame`) dengan `generate_audio: false`. Model bawaan:
+`DEFAULT_IMAGE_MODEL` (`gpt-image-2.5-sunburst`) dan `DEFAULT_VIDEO_MODEL` (`veo-3.1-fast-generate-001`). ID yang
+tidak dikenal, misalnya model dari versi lama, jatuh ke model bawaan saat dibaca.
+
+**Menambah model**: tambahkan satu baris `image(...)` atau `video(...)` di `MODELS`, isi field persis seperti di
+referensi API, lalu jalankan `npm run typecheck`. Ikon keluarga model diatur di `components/ModelLogo.tsx`.
 
 ## Whisper lokal (`src/main/whisper.ts`)
 

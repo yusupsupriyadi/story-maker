@@ -6,7 +6,7 @@
 
 **Ubah ide cerita jadi video YouTube, langsung dari komputermu.**
 
-AI menyusun naskah dan visual, Higgsfield membuat gambar dan video, narator AI mengisi suara,<br>
+AI menyusun naskah dan visual, ElevenLabs membuat gambar dan video, narator AI mengisi suara,<br>
 lalu kamu merapikannya di editor timeline dan mengekspor MP4.
 
 [![Versi](https://img.shields.io/badge/versi-1.0.0-c93a1b?style=flat-square)](CHANGELOG.md)
@@ -44,7 +44,7 @@ Semua proyek, gambar, video, dan suara disimpan di komputermu. Kamu memakai kunc
   - bahasa dan format (16:9 atau 9:16);
   - gaya visual (2D, 3D, atau realistis);
   - suara narator.
-- Pilih model gambar dan video Higgsfield per proyek, lengkap dengan perkiraan kredit.
+- Pilih model gambar dan video ElevenLabs per proyek.
 
 **2. Naskah**
 - AI menulis alur dan narasi (VO) setiap adegan. Adegan bisa diubah, ditambah, dihapus, dan diurutkan ulang.
@@ -56,7 +56,7 @@ Semua proyek, gambar, video, dan suara disimpan di komputermu. Kamu memakai kunc
   - pemeran beserta lembar karakter;
   - gerak kamera dan transisi;
   - arahan gerak untuk video AI.
-- Tersedia 14 model gambar dan 34 model video dari Higgsfield.
+- Tersedia 9 model gambar (GPT Image, Nano Banana, Seedream) dan 6 model video (Veo, Seedance) dari ElevenLabs.
 - Narasi direkam dalam satu rekaman utuh (Gemini TTS atau ElevenLabs), lalu dipotong otomatis per adegan. Suara dan intonasinya jadi konsisten.
 
 **4. Editor**
@@ -105,7 +105,7 @@ Cara membuat video dari ide sampai ekspor: [tonton di YouTube](https://youtu.be/
 
 - **Windows 10/11 64-bit.** Aplikasi juga bisa dijalankan dari kode sumber di macOS, tapi belum diuji penuh. Caption akurat (Whisper) dan installer baru tersedia untuk Windows.
 - **Kunci API** (lihat [Kunci API](#kunci-api)) untuk:
-  - Higgsfield;
+  - ElevenLabs paket Pro ke atas, untuk gambar dan video;
   - satu penyusun cerita;
   - satu penyedia suara narator.
 - **Node.js 22 atau lebih baru**, hanya kalau menjalankan dari kode sumber.
@@ -144,10 +144,9 @@ Setiap bagian (penyusun cerita, suara narator) punya satu dropdown penyedia. Han
 
 | Layanan | Dipakai untuk | Wajib |
 |---|---|---|
-| [Higgsfield](https://higgsfield.ai) (satu kunci dari tombol **Copy API key**, format `KEY_ID:KEY_SECRET`) | Gambar, lembar karakter, video AI | Ya |
+| [ElevenLabs](https://elevenlabs.io/app/settings/api-keys) (paket Pro ke atas, kunci dengan izin **Image & Video**) | Gambar, lembar karakter, video AI, dan suara narator ElevenLabs | Ya |
 | Penyusun cerita, pilih satu: Google Gemini, OpenRouter, Groq, atau endpoint custom yang kompatibel dengan OpenAI | Naskah, rencana visual, pemeran | Ya, salah satu |
 | Google Gemini | Suara narator Gemini TTS | Kalau memakai Gemini TTS |
-| ElevenLabs | Suara narator dengan waktu per kata yang presisi | Opsional |
 
 - **Daftar model penyusun cerita** diambil langsung dari penyedia setelah kuncinya disimpan, lalu dipilih lewat dropdown yang bisa dicari.
 - **Endpoint custom** menerima server apa pun yang kompatibel dengan OpenAI API, misalnya:
@@ -161,10 +160,10 @@ Setiap bagian (penyusun cerita, suara narator) punya satu dropdown penyedia. Han
 <summary><b>Apakah Bang Story gratis?</b></summary>
 
 Ya. Aplikasinya gratis dan kodenya terbuka dengan lisensi MIT. Yang berbayar hanya pemakaian layanan AI. Biayanya kamu bayar langsung ke penyedia, dengan kunci API milikmu:
-- kredit Higgsfield untuk gambar dan video;
+- kredit ElevenLabs untuk gambar dan video (paket Pro ke atas);
 - biaya Gemini, OpenRouter, Groq, atau ElevenLabs sesuai paket akunmu.
 
-Perkiraan kredit tiap model Higgsfield ditampilkan sebelum membuat gambar atau video. Perkiraannya diambil dari endpoint `estimate` Higgsfield, yang tidak memakai kredit.
+Aplikasi tidak menampilkan perkiraan kredit karena API ElevenLabs tidak menyediakannya. Biaya tiap model bisa kamu lihat di aplikasi web ElevenLabs sebelum membuat gambar atau video.
 </details>
 
 <details>
@@ -186,11 +185,11 @@ Gemini TTS tidak mengirim waktu per kata, jadi tanpa Whisper waktunya hanya perk
 </details>
 
 <details>
-<summary><b>Kenapa model Seedream tidak ada?</b></summary>
+<summary><b>Kenapa model Seedream dan Seedance tidak bisa dipakai?</b></summary>
 
-Seedream belum tersedia di API Higgsfield, hanya di aplikasi web mereka. Model bawaannya:
+Model ByteDance (Seedream dan Seedance) dikunci ElevenLabs sampai akunmu disetujui. Selama belum disetujui, pakai model lain. Model bawaannya:
 - gambar: GPT Image 2.5 Sunburst;
-- video: Kling 3.0 Standard.
+- video: Veo 3.1 Fast.
 
 Model lain bisa dipilih per proyek.
 </details>
@@ -212,7 +211,7 @@ npm run dist         # installer Windows ke folder dist/
 | Penyimpanan | SQLite (better-sqlite3) dan file lokal |
 | Video dan audio | FFmpeg (ffmpeg-static), caption ASS/libass |
 | Caption akurat | whisper.cpp dengan model Whisper Small |
-| Layanan AI | Higgsfield, Google Gemini, OpenRouter, Groq, ElevenLabs |
+| Layanan AI | Google Gemini, OpenRouter, Groq, ElevenLabs |
 
 ```
 src/

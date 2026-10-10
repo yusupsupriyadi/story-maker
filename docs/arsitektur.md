@@ -11,7 +11,7 @@
 | Database | SQLite lewat better-sqlite3 |
 | Video/audio | FFmpeg (`ffmpeg-static`), libass untuk caption |
 | Pengenal suara | whisper.cpp (`resources/whisper/whisper-cli.exe`) + model Whisper Small |
-| AI | Gemini (`@google/genai`), API OpenAI-compatible (OpenRouter, Groq, custom), ElevenLabs, Higgsfield |
+| AI | Gemini (`@google/genai`), API OpenAI-compatible (OpenRouter, Groq, custom), ElevenLabs (suara, gambar, video) |
 
 ## Tiga proses
 
@@ -41,7 +41,7 @@ Jendela dibuat dengan `sandbox: true`, `contextIsolation: true`, `nodeIntegratio
 |---|---|---|
 | `projects:*` | list, create, get, save, remove, duplicate | proyek dan snapshot |
 | `story:*` | script, visuals, musicPrompt | LLM: naskah, rencana visual, prompt musik |
-| `generate:*` | clipImage, clipVideo, clipTts, characterSheet, missingImages, missingVideos, missingTts, narration, syncCaptions, cancel, estimate | job AI dan estimasi kredit |
+| `generate:*` | clipImage, clipVideo, clipTts, characterSheet, missingImages, missingVideos, missingTts, narration, syncCaptions, cancel | job AI |
 | `clips:*` | split, detachVoice | edit timeline yang menyentuh file |
 | `assets:*` | setActive, setWords, pickMusic, pickImage | aset klip, caption, musik, logo |
 | `settings:*` | get, set, keys, setKey, setCustom, clearKey, revealKey, testKey, voices | pengaturan dan kunci API |
@@ -60,13 +60,13 @@ renderer lewat `event:job` (progres, pesan, error).
 
 | Antrean | Batas paralel | Dipakai untuk |
 |---|---|---|
-| `higgsfield` | 3 | gambar, lembar karakter, video |
+| `media` | 3 | gambar, lembar karakter, video (ElevenLabs) |
 | `tts` | 2 | narasi, TTS per klip |
 | `whisper` | 1 | sinkron caption (Whisper memakai banyak core CPU) |
 | `export` | 1 | ekspor MP4 |
 
 Setiap job punya `AbortController` sehingga bisa dibatalkan (`generate:cancel`). Saat aplikasi dibuka lagi,
-`resumeJobs()` melanjutkan permintaan Higgsfield yang sudah terkirim; job lain yang terputus ditandai gagal.
+`resumeJobs()` melanjutkan polling generation ElevenLabs yang sudah terkirim; job lain yang terputus ditandai gagal.
 
 ## Penyimpanan
 

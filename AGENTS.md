@@ -1,7 +1,7 @@
 # AGENTS.md — panduan untuk AI agent dan pengembang
 
 Bang Story adalah aplikasi desktop (Electron + React + TypeScript) yang mengubah ide cerita menjadi video YouTube:
-AI menulis naskah dan rencana visual, Higgsfield membuat gambar dan video, Gemini atau ElevenLabs membuat suara
+AI menulis naskah dan rencana visual, ElevenLabs membuat gambar dan video, Gemini atau ElevenLabs membuat suara
 narator, lalu semuanya dirangkai di editor timeline dan diekspor jadi MP4 dengan FFmpeg.
 
 Baca file ini dulu sebelum mengubah kode. Detail lengkapnya ada di folder [`docs/`](docs/README.md).
@@ -29,7 +29,7 @@ src/
     repo.ts        akses SQLite (proyek, klip, pemeran, aset, job)
     db/index.ts    skema + migrasi (PRAGMA user_version)
     story.ts       naskah, rencana visual, prompt musik (LLM)
-    generation.ts  gambar/video Higgsfield, lembar karakter, TTS per klip, estimasi kredit
+    generation.ts  gambar/video ElevenLabs, lembar karakter, TTS per klip
     narration.ts   narasi satu rekaman utuh lalu dipotong per adegan; sinkron caption
     whisper.ts     whisper.cpp lokal (unduh model, kenali kata)
     align.ts, cuts.ts  cocokkan kata naskah ke hasil Whisper; pilih titik potong antar-adegan
@@ -38,7 +38,7 @@ src/
     fontMetrics.ts lebar teks dari file TTF (untuk kotak caption di ekspor)
     jobs.ts, events.ts  antrean job + event ke renderer
     secrets.ts     kunci API terenkripsi (safeStorage/DPAPI)
-    services/      klien API: gemini, elevenlabs, higgsfield, llm (OpenAI-compatible), audio, http
+    services/      klien API: gemini, elevenlabs (suara), elevenMedia (gambar/video), llm (OpenAI-compatible), audio, http
     devharness.ts  otomatisasi uji (hanya mode pengembangan)
   preload/         jembatan aman: window.api (lihat src/shared/api.ts)
   shared/          kode yang dipakai main DAN renderer (tipe, aturan gerak, caption, timeline)
@@ -55,7 +55,7 @@ docs/              dokumentasi pengembang
 1. **Pratinjau dan ekspor harus sama.** Semua aturan yang memengaruhi gambar atau suara final ditulis sekali di
    `src/shared/` lalu dipakai pratinjau (renderer) dan ekspor (main):
    `motion.ts` (gerak kamera, transisi), `captions.ts` (gaya, font, pemenggalan baris caption),
-   `timeline.ts` (potongan suara/musik, kata caption per klip), `overlays.ts`, `higgsfield.ts`.
+   `timeline.ts` (potongan suara/musik, kata caption per klip), `overlays.ts`, `media.ts`.
    Jangan menghitung ulang aturan itu di satu sisi saja.
 2. **Kunci API milik pengguna (BYOK).** Kunci hanya disimpan terenkripsi lewat `secrets.ts`, hanya dikirim ke
    layanannya masing-masing, dan tidak pernah dicetak ke log, error, atau file.

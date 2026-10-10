@@ -13,7 +13,10 @@
 | Sinkron Whisper menimpa edit caption manual | `syncCaptions` menulis ulang `meta.words` dari naskah, jadi teks caption yang diedit tangan kembali ke naskah. Ini terjadi pada mode "semua klip", dan pada klip yang memang perlu disinkronkan. | Lewati klip dengan `meta.editedWords`, atau tanya pengguna dulu. |
 | Riwayat versi aset setelah split | Bagian kedua memakai gambar/video milik klip asal; riwayat versinya ada di klip asal. | Salin baris aset untuk klip baru kalau riwayat per bagian diperlukan. |
 | Caption sulit digeser utuh | Potongan caption berdempetan, jadi menyeret badannya sering tidak punya ruang. | Tarik tepinya; atau izinkan geser yang ikut mendorong potongan tetangga. |
-| Tidak semua model sudah diuji langsung | Katalog Higgsfield berisi 48 model; sebagian besar baru diuji lewat body permintaan, belum lewat generate sungguhan. Penyedia LLM selain Gemini juga belum semuanya diuji. | Uji model yang sering dipakai, lalu catat model yang bermasalah. |
+| Tidak semua model sudah diuji langsung | Katalog ElevenLabs (9 model gambar, 6 model video) disusun dari referensi API dan baru diuji lewat body permintaan, belum lewat generate sungguhan. Penyedia LLM selain Gemini juga belum semuanya diuji. | Uji model yang sering dipakai, lalu catat model yang bermasalah. |
+| Gambar dan video butuh paket ElevenLabs Pro | Akun di bawah Pro ditolak dengan `paid_plan_required`. Tes kunci memanggil `GET /v1/flows/image` untuk mendeteksinya, tapi belum dipastikan endpoint daftar itu juga dibatasi paket. | Kalau tes kunci bilang siap tapi generate ditolak, ubah `checkAccess` (misalnya cek `tier` dari `/v1/user/subscription`). |
+| Batal tidak menghentikan tagihan | API tidak punya endpoint pembatalan, jadi tombol batal hanya membuat aplikasi berhenti menunggu. Generation di ElevenLabs tetap selesai dan ditagih. | Pakai endpoint pembatalan kalau ElevenLabs menambahkannya. |
+| Seedream dan Seedance perlu persetujuan | Model ByteDance dikunci sampai ElevenLabs menyetujui akun (`model_access_denied`). | Pesan error sudah menjelaskannya; pengguna memilih model lain atau meminta akses ke ElevenLabs. |
 
 ## Ide pengembangan
 
