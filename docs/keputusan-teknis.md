@@ -106,3 +106,8 @@ proyek, jadi semua varian Seedance memakai `auto` agar aturannya sama dan permin
 Setiap generation yang sudah dimulai ditagih, dan ElevenLabs tidak mendokumentasikan idempotency key. Mengulang
 `POST` setelah 5xx atau koneksi putus bisa memulai generation kedua. Hanya 429 yang dicoba ulang, karena permintaan
 itu pasti ditolak sebelum berjalan. Polling (`GET`) aman diulang.
+
+### Veo tidak mengirim `enhance_prompt: false`
+Skema API mencantumkan `enhance_prompt` untuk Veo 3.1, tapi uji sungguhan (10 Oktober 2026) gagal dengan pesan
+"Veo 3 prompt enhancement cannot be disabled" (tidak ditagih). Field itu sekarang tidak dikirim, jadi Veo memakai
+bawaannya. Jangan menambahkannya lagi tanpa uji ulang ke API.

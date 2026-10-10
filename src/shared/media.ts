@@ -27,8 +27,6 @@ export interface MediaModel {
   durations: { values: number[] } | { min: number; max: number } | null
   /** Seedance reads the frame shape from the start frame instead of an explicit ratio. */
   autoAspect: boolean
-  /** Veo rewrites prompts unless `enhance_prompt` is switched off. */
-  enhanceSwitch: boolean
   /** ByteDance models stay locked until ElevenLabs approves the workspace. */
   gated: boolean
   tags: string[]
@@ -39,11 +37,11 @@ export const ACCESS_TAG = 'Perlu akses'
 const GPT_25_QUALITY = ['low', 'medium', 'high', 'xhigh', 'max']
 
 function image(id: string, name: string, family: string, refs: number, resolutions: string[], more: Partial<MediaModel> = {}): MediaModel {
-  return { id, name, family, kind: 'image', refs, resolutions, qualities: [], durations: null, autoAspect: false, enhanceSwitch: false, gated: false, tags: [family], ...more }
+  return { id, name, family, kind: 'image', refs, resolutions, qualities: [], durations: null, autoAspect: false, gated: false, tags: [family], ...more }
 }
 
 function video(id: string, name: string, family: string, durations: MediaModel['durations'], resolutions: string[], more: Partial<MediaModel> = {}): MediaModel {
-  return { id, name, family, kind: 'video', refs: 0, resolutions, qualities: [], durations, autoAspect: false, enhanceSwitch: false, gated: false, tags: [family], ...more }
+  return { id, name, family, kind: 'video', refs: 0, resolutions, qualities: [], durations, autoAspect: false, gated: false, tags: [family], ...more }
 }
 
 const SEEDANCE: Partial<MediaModel> = { autoAspect: true, gated: true }
@@ -58,8 +56,8 @@ const MODELS: MediaModel[] = [
   image('gemini-2.5-flash-image', 'Nano Banana', 'Nano Banana', 5, []),
   image('bytedance-seedream-5-pro', 'Seedream 5 Pro', 'Seedream', 10, ['1K', '2K'], { gated: true, tags: ['Seedream', ACCESS_TAG] }),
   image('bytedance-seedream-5-lite', 'Seedream 5 Lite', 'Seedream', 10, ['2K', '3K'], { gated: true, tags: ['Seedream', ACCESS_TAG] }),
-  video('veo-3.1-fast-generate-001', 'Veo 3.1 Fast', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { enhanceSwitch: true, tags: ['Veo', '4K'] }),
-  video('veo-3.1-generate-001', 'Veo 3.1', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { enhanceSwitch: true, tags: ['Veo', '4K'] }),
+  video('veo-3.1-fast-generate-001', 'Veo 3.1 Fast', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { tags: ['Veo', '4K'] }),
+  video('veo-3.1-generate-001', 'Veo 3.1', 'Veo', { values: [4, 6, 8] }, ['720p', '1080p', '4K'], { tags: ['Veo', '4K'] }),
   video('bytedance-seedance-v2', 'Seedance 2.0', 'Seedance', { min: 4, max: 15 }, ['480p', '720p', '1080p', '4k'], { ...SEEDANCE, tags: ['Seedance', '4K', ACCESS_TAG] }),
   video('bytedance-seedance-v2-fast', 'Seedance 2.0 Fast', 'Seedance', { min: 4, max: 15 }, ['480p', '720p'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG] }),
   video('bytedance-seedance-v2-mini', 'Seedance 2.0 Mini', 'Seedance', { min: 4, max: 15 }, ['480p', '720p'], { ...SEEDANCE, tags: ['Seedance', ACCESS_TAG] }),
@@ -181,8 +179,8 @@ export function videoBody(
   if (duration != null) body.duration_secs = duration
   const res = resolutionFor(m, resolution)
   if (res) body.resolution = res
-  // The story already describes each shot in detail, so rewriting it would drift from the storyboard.
-  if (m.enhanceSwitch) body.enhance_prompt = false
+  // enhance_prompt stays at its default: ElevenLabs fails Veo generations that switch prompt enhancement off,
+  // even though the schema lists the field.
   return body
 }
 

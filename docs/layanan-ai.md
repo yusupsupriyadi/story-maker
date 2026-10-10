@@ -75,11 +75,11 @@ itu:
 - `resolutions`, `qualities`: nilai `resolution` dan `quality` yang diterima. Kosong berarti field tidak dikirim.
 - `durations`: daftar (`values`) atau rentang (`min`/`max`) `duration_secs` video.
 - `autoAspect`: Seedance memakai `aspect_ratio: "auto"`, rasio diambil dari gambar awal.
-- `enhanceSwitch`: Veo menerima `enhance_prompt: false`.
 - `gated`: model ByteDance (Seedream, Seedance) baru bisa dipakai setelah ElevenLabs membuka aksesnya. Diberi tag
   `Perlu akses`.
 
-Semua video dimulai dari gambar klip (`start_frame`) dengan `generate_audio: false`. Model bawaan:
+Semua video dimulai dari gambar klip (`start_frame`) dengan `generate_audio: false`. `enhance_prompt` tidak dikirim:
+Veo di ElevenLabs gagal kalau peningkatan prompt dimatikan. Model bawaan:
 `DEFAULT_IMAGE_MODEL` (`gpt-image-2.5-sunburst`) dan `DEFAULT_VIDEO_MODEL` (`veo-3.1-fast-generate-001`). ID yang
 tidak dikenal, misalnya model dari versi lama, jatuh ke model bawaan saat dibaca.
 
